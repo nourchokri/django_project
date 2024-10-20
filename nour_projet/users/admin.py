@@ -28,6 +28,21 @@ class ParticipantAdmin(admin.ModelAdmin):
     list_editable = ('first_name', 'last_name')
 
 
+
+
+
+class ReservationAdmin(admin.ModelAdmin):
+    list_display = ["conference","participant","confirmed"]
+    actions=['confirmed','unconfirmed']
+    def confirmed(self,request,queryset):
+        queryset.update(confirmed=True)
+        self.message_user(request,"les messages sont confirmés")
+    confirmed.short_description = "Confirmer les messages"
+    def unconfirmed(self,request,queryset):
+        queryset.update(confirmed=False)
+        self.message_user(request,"les messages sont inconfirmés")
+    unconfirmed.short_description = "inConfirmer les messages"
+
 # Register your models here.
 admin.site.register(Participant,ParticipantAdmin)
-admin.site.register(Reservations)
+admin.site.register(Reservations,ReservationAdmin)

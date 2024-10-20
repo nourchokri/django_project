@@ -15,6 +15,8 @@ class ReservationInLine(admin.StackedInline):
     extra=1
     readonly_fields=('reservation_date',)
     can_delete=True
+
+
 class participantfilter(admin.SimpleListFilter):
     title = ('participant filter')
     parameter_name = 'participant_filter'
@@ -23,15 +25,22 @@ class participantfilter(admin.SimpleListFilter):
             ('0',('No participants')),
             ('more',('More participants'))
         )
+    """
     def queryset(self, request, queryset):
         if self.value() == '0':
-            return queryset.annotate(participant_count=Count('reservations')).filter(participant_count=0)
+            return queryset.annotate(participant_count=Count('reservations')).filter(participant_count=0) # Count('reservations') el reservation mel related name li aamelnah fel model
         if self.value()=='more':
             return queryset.annotate(participant_count=Count('reservations')).filter(participant_count__gt=0)
 
         
         return queryset
-        
+        """
+    def queryset(self, request, queryset):
+        if self.value() == '0':
+            return queryset.filter(reservations__isnull=True)
+        if self.value()=='more':
+            return queryset.filter(reservations__isnull=False)
+        return queryset
 
 class ConferenceDateFilter(admin.SimpleListFilter):
     title = ('conference date')
@@ -67,7 +76,7 @@ class ConferenceAdmin(admin.ModelAdmin): # type: ignore
     list_display = ('title','location', 'start_date','end_date', 'price')
     search_fields=('title',)
     #list_per_page=1
-    ordering=('start_date','title')
+    ordering=('start_date','title') # ordre inverse ordering=('-start_date') 
     fieldsets=(
         ('description',{
             'fields':('title','description','location','category')
